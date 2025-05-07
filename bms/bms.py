@@ -84,7 +84,7 @@ def post_process(saliency_map):
 
 
 if __name__ == "__main__":
-    image = cv2.imread("../example2.jpg")
+    image = cv2.imread("../pictures/example2.jpg")
     if image is None:
         print("Nie znaleziono pliku.")
         exit()
