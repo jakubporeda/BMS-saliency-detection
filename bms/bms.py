@@ -83,36 +83,36 @@ def post_process(saliency_map):
     return enhanced
 
 
-if __name__ == "__main__":
-    image = cv2.imread("../pictures/example2.jpg")
-    if image is None:
-        print("Nie znaleziono pliku.")
-        exit()
-
-    lab = resize_and_convert_to_lab(image)
-    L, A, B = cv2.split(lab)
-
-    # cv2.imshow("Kanal L (jasnosc)", L)
-    # cv2.imshow("Kanal A (zielony–czerwony)", A)
-    # cv2.imshow("Kanal (niebieski–zolty)", B)
-
-    boolean_maps = generate_boolean_maps(lab, thresholds_per_channel=20)
-
-    # for i, (channel_idx, threshold, binary_map) in enumerate(boolean_maps):
-    #     channel_name = ["L", "A", "B"][channel_idx]
-    #     sign = ">" if threshold > 0 else "<="
-    #     window_title = f"Mapa binarna {channel_name} {sign} {abs(int(threshold))}"
-    #     cv2.imshow(window_title, binary_map)
-
-    print(f"Wygenerowano {len(boolean_maps)} map binarnych (po {2*4} dla każdego kanału = {len(boolean_maps)} łącznie).")
-
-    attention = compute_attention_map(boolean_maps, lab.shape)
-    attention_norm = cv2.normalize(attention, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-
-    cv2.imshow("Mapa uwagi (attention map)", attention_norm)
-
-    post = post_process(attention_norm)
-    cv2.imshow("Po postprocessingu", post)
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+# if __name__ == "__main__":
+#     image = cv2.imread("../pictures/example2.jpg")
+#     if image is None:
+#         print("Nie znaleziono pliku.")
+#         exit()
+#
+#     lab = resize_and_convert_to_lab(image)
+#     L, A, B = cv2.split(lab)
+#
+#     # cv2.imshow("Kanal L (jasnosc)", L)
+#     # cv2.imshow("Kanal A (zielony–czerwony)", A)
+#     # cv2.imshow("Kanal (niebieski–zolty)", B)
+#
+#     boolean_maps = generate_boolean_maps(lab, thresholds_per_channel=20)
+#
+#     # for i, (channel_idx, threshold, binary_map) in enumerate(boolean_maps):
+#     #     channel_name = ["L", "A", "B"][channel_idx]
+#     #     sign = ">" if threshold > 0 else "<="
+#     #     window_title = f"Mapa binarna {channel_name} {sign} {abs(int(threshold))}"
+#     #     cv2.imshow(window_title, binary_map)
+#
+#     print(f"Wygenerowano {len(boolean_maps)} map binarnych (po {2*4} dla każdego kanału = {len(boolean_maps)} łącznie).")
+#
+#     attention = compute_attention_map(boolean_maps, lab.shape)
+#     attention_norm = cv2.normalize(attention, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+#
+#     cv2.imshow("Mapa uwagi (attention map)", attention_norm)
+#
+#     post = post_process(attention_norm)
+#     cv2.imshow("Po postprocessingu", post)
+#
+#     cv2.waitKey(0)
+#     cv2.destroyAllWindows()
