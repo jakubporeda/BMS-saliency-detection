@@ -172,37 +172,49 @@ class BMS_GUI:
     def load_random_cat2000(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         base_path = os.path.join(current_dir, "..", "pictures", "CAT2000")
-
         stim_dir = os.path.join(base_path, "Stimuli")
         fix_dir = os.path.join(base_path, "FIXATIONMAPS")
 
-        categories = os.listdir(stim_dir)
-        chosen_cat = random.choice(categories)
-
-        cat_stim_path = os.path.join(stim_dir, chosen_cat)
-        cat_fix_path = os.path.join(fix_dir, chosen_cat)
-
-        image_files = [f for f in os.listdir(cat_stim_path) if f.lower().endswith(".jpg")]
-        if not image_files:
-            messagebox.showerror("Błąd", f"Brak obrazów w kategorii {chosen_cat}")
+        # Sprawdzenie czy foldery istnieją
+        if not os.path.exists(stim_dir) or not os.path.exists(fix_dir):
+            messagebox.showerror("Błąd", f"Nie znaleziono folderu CAT2000.\nSprawdź, czy dane są w:\n{base_path}")
             return
 
-        chosen_img = random.choice(image_files)
-        stim_img_path = os.path.join(cat_stim_path, chosen_img)
-        fix_img_path = os.path.join(cat_fix_path, chosen_img)
+        try:
+            categories = [c for c in os.listdir(stim_dir) if os.path.isdir(os.path.join(stim_dir, c))]
+            if not categories:
+                messagebox.showerror("Błąd", "Brak kategorii w katalogu Stimuli.")
+                return
 
-        # Wczytanie obrazów
-        stim = cv2.imread(stim_img_path)
-        fix = cv2.imread(fix_img_path, cv2.IMREAD_GRAYSCALE)  # fixation map zwykle jest w skali szarości
+            chosen_cat = random.choice(categories)
 
-        if stim is None or fix is None:
-            messagebox.showerror("Błąd", "Nie udało się wczytać obrazów.")
-            return
+            cat_stim_path = os.path.join(stim_dir, chosen_cat)
+            cat_fix_path = os.path.join(fix_dir, chosen_cat)
 
-        self.original_image = stim
-        self.fixation_image = fix
-        self.processed_image = None
+            image_files = [f for f in os.listdir(cat_stim_path) if f.lower().endswith(".jpg")]
+            if not image_files:
+                messagebox.showerror("Błąd", f"Brak obrazów w kategorii {chosen_cat}")
+                return
 
-        self.display_image(self.original_image, self.canvas_original)
-        self.display_image(self.fixation_image, self.canvas_fixation, is_gray=True)
-        self.canvas_result.configure(image="")  # Wyczyść canvas BMS
+            chosen_img = random.choice(image_files)
+            stim_img_path = os.path.join(cat_stim_path, chosen_img)
+            fix_img_path = os.path.join(cat_fix_path, chosen_img)
+
+            stim = cv2.imread(stim_img_path)
+            fix = cv2.imread(fix_img_path, cv2.IMREAD_GRAYSCALE)
+
+            if stim is None or fix is None:
+                messagebox.showerror("Błąd", f"Nie udało się wczytać:\n{chosen_img}")
+                return
+
+            self.original_image = stim
+            self.fixation_image = fix
+            self.processed_image = None
+
+            self.display_image(self.original_image, self.canvas_original)
+            self.display_image(self.fixation_image, self.canvas_fixation, is_gray=True)
+            self.canvas_result.configure(image="")  # Wyczyść canvas BMS
+
+        except Exception as e:
+            messagebox.showerror("Błąd krytyczny", f"Wystąpił błąd:\n{str(e)}")
+
